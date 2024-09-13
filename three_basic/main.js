@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 const canvas = document.getElementById('canvas')
 
 const scene = new THREE.Scene()
@@ -10,12 +10,12 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.z = 5
  
 const geometry = new THREE.DodecahedronGeometry()
-const material = new THREE.MeshBasicMaterial({color:'#4658d5'})
+const material = new THREE.MeshLambertMaterial({color:'#468585', emissive: '#468585'})
 
 const dodecahedron = new THREE.Mesh(geometry, material)
 
 const boxGeometry = new THREE.BoxGeometry(2,0.1,2)
-const boxMaterial = new THREE.MeshBasicMaterial({color: '#B4B4B4'})
+const boxMaterial = new THREE.MeshStandardMaterial({color: '#B4B4B4', emissive: '#B4B4B4'})
 
 const box = new THREE.Mesh(boxGeometry, boxMaterial)
 box.position.y = -1.5
@@ -29,6 +29,31 @@ scene.add(light)
 
 const renderer = new THREE.WebGLRenderer({canvas})
 
+renderer.setPixelRatio(window.devicePixelRatio)
+
 renderer.setSize(window.innerWidth, window.innerHeight)
 
-renderer.render(scene, camera)
+
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableDamping = true
+controls.dampingFactor = 0.05
+controls.enableZoom = true
+controls.enablePan = true
+
+function animate(){
+  requestAnimationFrame(animate)
+  dodecahedron.rotation.x += 0.01
+  dodecahedron.rotation.y += 0.001
+  
+  box.rotation.y += 0.005;
+  controls.update()
+  renderer.render(scene, camera)
+}
+
+window.addEventListener('resize' , () => {
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+})
+
+animate()
